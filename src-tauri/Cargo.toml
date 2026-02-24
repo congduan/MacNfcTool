@@ -1,0 +1,26 @@
+[package]
+name = "mac-nfc-tool"
+version = "0.1.0"
+description = "PN532 NFC GUI by Tauri + React"
+authors = ["congduan"]
+edition = "2021"
+
+[build-dependencies]
+cc = "1.1"
+pkg-config = "0.3"
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+notify = "6"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+thiserror = "1"
+# Keep toolchain compatibility with rustc 1.85.0 (newer time needs 1.88+).
+time = "=0.3.36"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

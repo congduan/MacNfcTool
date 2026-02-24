@@ -1,0 +1,17 @@
+node_modules
+dist
+.vite
+.DS_Store
+*.log
+
+src-tauri/target
+src-tauri/gen
+
+# local env / editor
+.env
+.env.*
+.idea
+.vscode
+
+# libnfc
+third_party/libnfc
