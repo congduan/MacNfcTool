@@ -47,32 +47,32 @@ A simple and intuitive NFC tool for Mac, designed for reading and writing Mifare
 
 ### Connecting to a Reader
 1. Connect your PN532 NFC module to your Mac
-2. Click "连接读卡器" to establish a connection
+2. Click "Connect Reader" to establish a connection
 3. The device information will be displayed in the sidebar
 
 ### Reading Card Information
 1. Place a Mifare Classic card on the reader
-2. Click "读取卡片信息" to get basic card details
+2. Click "Read Card Info" to get basic card details
 
 ### Reading Sectors
 1. Select a sector using the quick filter buttons (0-15)
-2. Click the "读取" button on the sector card
+2. Click the "Read" button on the sector card
 3. The sector data will be displayed in hex format
 
 ### Writing Sectors
 1. Select a sector using the quick filter buttons (0-15)
-2. Click the "写入" button on the sector card
+2. Click the "Write" button on the sector card
 3. Enter the data you want to write
 
 ### Reading All Sectors
-1. Click the "读取全部数据" button in the top right corner
+1. Click the "Read All Data" button in the top right corner
 2. All 16 sectors will be read and displayed
 
 ### Saving/Loading Data
-1. Enter a file path in the "文件路径(JSON)" field
-2. Click "读取并保存16扇区" to save all sector data to a file
-3. Click "从文件加载预览" to load data from a file
-4. Click "将文件写入卡片" to write data from a file to the card
+1. Enter a file path in the "File Path(JSON)" field
+2. Click "Read & Save 16 Sectors" to save all sector data to a file
+3. Click "Load Preview from File" to load data from a file
+4. Click "Write File to Card" to write data from a file to the card
 
 ## Key Presets
 
