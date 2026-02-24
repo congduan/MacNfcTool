@@ -77,7 +77,7 @@ export default function App() {
   const autoReadErrorRef = useRef<string | null>(null);
   const busy = pendingOps > 0;
 
-  const connectLabel = useMemo(() => (connected ? "断开读卡器" : "连接读卡器"), [connected]);
+  const connectLabel = useMemo(() => (connected ? "Disconnect Reader" : "Connect Reader"), [connected]);
 
   const filteredSectors = useMemo(() => {
     const q = sectorFilter.trim();
@@ -103,9 +103,9 @@ export default function App() {
       if (prevAvailableRef.current === null) {
         prevAvailableRef.current = status.available;
       } else if (prevAvailableRef.current !== status.available) {
-        addLog("info", status.available ? "检测到NFC设备已插入" : "检测到NFC设备已移除");
-        prevAvailableRef.current = status.available;
-      }
+                    addLog("info", status.available ? "NFC device detected" : "NFC device removed");
+                    prevAvailableRef.current = status.available;
+                  }
 
       if (!status.available && connected) {
         setConnected(false);
@@ -125,9 +125,9 @@ export default function App() {
         prevAvailableRef.current = status.available;
       })
       .catch((err) => {
-        const message = err instanceof Error ? err.message : String(err);
-        addLog("error", `设备探测失败: ${message}`);
-      });
+                    const message = err instanceof Error ? err.message : String(err);
+                    addLog("error", `Device detection failed: ${message}`);
+                  });
 
     return () => {
       unlistenPromise.then((unlisten) => unlisten()).catch(() => {});
@@ -174,14 +174,14 @@ export default function App() {
       })));
       setLoadedDump(null);
       setDeviceName("");
-      addLog("info", "读卡器已断开");
+      addLog("info", "Reader disconnected");
       return;
     }
 
     const name = await call<string>("connect_reader");
     setConnected(true);
     setDeviceName(name);
-    addLog("info", `读卡器连接成功: ${name}`);
+    addLog("info", `Reader connected successfully: ${name}`);
   }
 
   async function onReadCard() {
@@ -190,7 +190,7 @@ export default function App() {
     lastCardUidRef.current = info.uid;
     noCardRef.current = false;
     autoReadErrorRef.current = null;
-    addLog("info", `读卡成功 UID=${info.uid}`);
+    addLog("info", `Card read successfully UID=${info.uid}`);
   }
 
   async function tryAutoReadCard() {
@@ -227,15 +227,15 @@ export default function App() {
 
       if (isNoCardError) {
         if (!noCardRef.current && lastCardUidRef.current) {
-          addLog("info", "卡片已移除");
-        }
+                    addLog("info", "Card removed");
+                  }
         setCardInfo(null);
         lastCardUidRef.current = null;
         noCardRef.current = true;
         autoReadErrorRef.current = null;
       } else if (autoReadErrorRef.current !== message) {
         autoReadErrorRef.current = message;
-        addLog("error", `自动读取卡片失败: ${message}`);
+        addLog("error", `Auto read card failed: ${message}`);
       }
     } finally {
       autoReadingRef.current = false;
@@ -311,7 +311,7 @@ export default function App() {
         };
         return newSectors;
       });
-      addLog("info", `读取扇区 ${sectorNumber} 成功`);
+      addLog("info", `Sector ${sectorNumber} read successfully`);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setAllSectors(prev => {
@@ -323,7 +323,7 @@ export default function App() {
         };
         return newSectors;
       });
-      addLog("error", `读取扇区 ${sectorNumber} 失败: ${message}`);
+      addLog("error", `Failed to read sector ${sectorNumber}: ${message}`);
       throw err;
     }
   }
@@ -345,7 +345,7 @@ export default function App() {
       }
     }
     setAllSectors(rows);
-    addLog("info", "读取16扇区完成");
+    addLog("info", "16 sectors read completed");
   }
 
   async function onReadSector(e: FormEvent) {
@@ -362,7 +362,7 @@ export default function App() {
       }
     });
     applyDumpToView(dump);
-    addLog("info", `已保存整卡数据: ${dumpPath}`);
+    addLog("info", `Full card data saved: ${dumpPath}`);
   }
 
   async function onLoadDumpFile() {
@@ -370,7 +370,7 @@ export default function App() {
       request: { path: dumpPath }
     });
     applyDumpToView(dump);
-    addLog("info", `已加载文件: ${dumpPath}`);
+    addLog("info", `File loaded: ${dumpPath}`);
   }
 
   async function onWriteDumpFile() {
@@ -382,7 +382,7 @@ export default function App() {
         writeTrailer
       }
     });
-    addLog("info", `已写入卡片: ${dumpPath}${writeTrailer ? " (含B3)" : ""}`);
+    addLog("info", `Written to card: ${dumpPath}${writeTrailer ? " (including B3)" : ""}`);
     await onReadAllSectors();
   }
 
@@ -397,7 +397,7 @@ export default function App() {
         keyType
       }
     });
-    addLog("info", `写入扇区${writeSector} 块${writeBlock} 成功`);
+    addLog("info", `Sector${writeSector} Block${writeBlock} written successfully`);
     await fetchSectorByNumber(Number(writeSector));
   }
 
@@ -410,39 +410,39 @@ export default function App() {
         </div>
 
         <section className="card">
-          <h2>设备信息</h2>
+          <h2>Device Info</h2>
           <div className="kv-list">
             <div>
-              <span>读卡器</span>
-              <strong>{deviceName || "未连接"}</strong>
+              <span>Reader</span>
+              <strong>{deviceName || "Not connected"}</strong>
             </div>
             <div>
-              <span>设备检测</span>
+              <span>Device Detection</span>
               <strong>
                 <span className={`led ${readerAvailable ? "online" : "offline"}`} />
-                {readerAvailable ? "已检测到" : "未检测到"}
+                {readerAvailable ? "Detected" : "Not detected"}
               </strong>
             </div>
             <div>
-              <span>连接状态</span>
-              <strong className={connected ? "ok" : "muted"}>{connected ? "已连接" : "未连接"}</strong>
+              <span>Connection Status</span>
+              <strong className={connected ? "ok" : "muted"}>{connected ? "Connected" : "Disconnected"}</strong>
             </div>
             <div>
-              <span>设备数量</span>
+              <span>Device Count</span>
               <strong>{readerCount}</strong>
             </div>
             <div>
-              <span>连接串</span>
+              <span>Connection String</span>
               <strong>{readerConnstring || "-"}</strong>
             </div>
           </div>
         </section>
 
         <section className="card">
-          <h2>卡片信息</h2>
+          <h2>Card Info</h2>
           <div className="kv-list">
             <div>
-              <span>卡UID</span>
+              <span>UID</span>
               <strong>{cardInfo?.uid || "-"}</strong>
             </div>
             <div>
@@ -454,7 +454,7 @@ export default function App() {
               <strong>{cardInfo?.sak || "-"}</strong>
             </div>
             <div>
-              <span>类型</span>
+              <span>Type</span>
               <strong>{cardInfo?.cardType || "-"}</strong>
             </div>
           </div>
@@ -462,17 +462,17 @@ export default function App() {
 
         <section className="card">
           <div className="card-header">
-            <h2>操作按钮</h2>
-            <span className={`status-pill ${busy ? "busy" : connected ? "ok" : "muted"}`}>{busy ? "处理中" : connected ? "已连接" : "未连接"}</span>
+            <h2>Actions</h2>
+            <span className={`status-pill ${busy ? "busy" : connected ? "ok" : "muted"}`}>{busy ? "Processing" : connected ? "Connected" : "Disconnected"}</span>
           </div>
           <div className="action-buttons">
             <button onClick={onConnect} disabled={busy}>{connectLabel}</button>
-            <button onClick={onReadCard} disabled={!connected || busy}>读取卡片信息</button>
+            <button onClick={onReadCard} disabled={!connected || busy}>Read Card Info</button>
           </div>
         </section>
 
         <section className="card">
-          <h2>密钥预设</h2>
+          <h2>Key Presets</h2>
           <div className="preset-grid">
             {COMMON_KEYS.map((k, index) => (
               <label key={k} className="preset-option">
@@ -488,7 +488,7 @@ export default function App() {
           </div>
           <div className="key-type-selector">
             <label>
-              密钥类型
+              Key Type
               <select value={keyType} onChange={(e) => setKeyType(e.target.value as "A" | "B")}>
                 <option value="A">Key A</option>
                 <option value="B">Key B</option>
@@ -498,19 +498,19 @@ export default function App() {
         </section>
 
         <section className="card">
-          <h2>数据文件</h2>
+          <h2>Data Files</h2>
           <div className="sidebar-form">
             <label>
-              文件路径(JSON)
+              File Path(JSON)
               <input value={dumpPath} onChange={(e) => setDumpPath(e.target.value)} />
             </label>
-            <button type="button" onClick={onReadSaveDump} disabled={!connected || busy}>读取并保存16扇区</button>
-            <button type="button" onClick={onLoadDumpFile} disabled={busy}>从文件加载预览</button>
+            <button type="button" onClick={onReadSaveDump} disabled={!connected || busy}>Read & Save 16 Sectors</button>
+            <button type="button" onClick={onLoadDumpFile} disabled={busy}>Load Preview from File</button>
             <label className="inline-check">
               <input type="checkbox" checked={writeTrailer} onChange={(e) => setWriteTrailer(e.target.checked)} />
-              写入 trailer block(B3，风险高)
+              Write trailer block(B3, high risk)
             </label>
-            <button type="button" onClick={onWriteDumpFile} disabled={!connected || busy}>将文件写入卡片</button>
+            <button type="button" onClick={onWriteDumpFile} disabled={!connected || busy}>Write File to Card</button>
           </div>
         </section>
 
@@ -521,11 +521,11 @@ export default function App() {
 
         <section className="card">
           <div className="section-head">
-            <h2>16扇区 HEX 总览</h2>
+            <h2>16 Sectors HEX Overview</h2>
             <div className="overview-actions">
               <div className="sector-buttons">
                 <button type="button" className="mini" onClick={() => setSectorFilter("")} disabled={!connected || busy}>
-                  全部
+                  All
                 </button>
                 {SECTOR_OPTIONS.slice(0, 8).map((n) => (
                   <button key={n} type="button" className="mini" onClick={() => setSectorFilter(n)} disabled={!connected || busy}>
@@ -539,7 +539,7 @@ export default function App() {
                     {n}
                   </button>
                 ))}
-                <button className="mini action-button read" onClick={onReadAllSectors} disabled={!connected || busy} title="读取全部数据">
+                <button className="mini action-button read" onClick={onReadAllSectors} disabled={!connected || busy} title="Read All Data">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -554,7 +554,7 @@ export default function App() {
                 <div className="sector-head">
                   <h3>Sector {entry.sector}</h3>
                   <div className="sector-actions">
-                    <button className="mini action-button read" onClick={() => fetchSectorByNumber(entry.sector)} disabled={!connected || busy} title="读取">
+                    <button className="mini action-button read" onClick={() => fetchSectorByNumber(entry.sector)} disabled={!connected || busy} title="Read">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -563,8 +563,8 @@ export default function App() {
                     </button>
                     <button className="mini action-button write" onClick={() => {
                       setWriteSector(String(entry.sector));
-                      // 不再切换视图，保持在总览页面
-                    }} disabled={!connected || busy} title="写入">
+                      // No longer switch view, stay on overview page
+                    }} disabled={!connected || busy} title="Write">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
@@ -595,16 +595,16 @@ export default function App() {
       <aside className="rightbar">
         <section className="card log-card">
           <div className="section-head">
-            <h2>操作日志</h2>
+            <h2>Operation Logs</h2>
             <div className="log-head-actions">
-              <span className="muted">{logs.length} 条</span>
+              <span className="muted">{logs.length} entries</span>
               <button type="button" className="mini" onClick={clearLogs} disabled={logs.length === 0}>
-                清空
+                Clear
               </button>
             </div>
           </div>
           <div className="log-list">
-            {logs.length === 0 ? <p className="muted">暂无日志</p> : null}
+            {logs.length === 0 ? <p className="muted">No logs yet</p> : null}
             {logs.map((log) => (
               <div key={log.id} className={`log-item ${log.level}`}>
                 <span>{log.at}</span>

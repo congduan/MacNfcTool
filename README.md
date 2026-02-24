@@ -1,74 +1,105 @@
-# MacNfcTool (Tauri + React + libnfc)
+# Mac NFC Tool
 
-一个基于 `Tauri + React` 的 PN532 NFC 工具，支持：
-- 连接 PN532 读卡器
-- 读取卡片 UID/ATQA/SAK/类型
-- 读取 Mifare Classic 1K 扇区数据并预览 HEX + ASCII
-- 写入指定扇区块（16 字节）
+A simple and intuitive NFC tool for Mac, designed for reading and writing Mifare Classic cards using PN532 module.
 
-## 运行前依赖
+## Features
 
-1. 下载 libnfc 源码到项目目录
+- **Device Management**: Connect and disconnect NFC readers
+- **Card Information**: Read basic card information (UID, ATQA, SAK, card type)
+- **Sector Operations**: Read and write individual sectors
+- **Batch Operations**: Read all 16 sectors at once
+- **Data Files**: Save and load card data to/from JSON files
+- **Key Management**: Preset common keys for easy access
+- **Quick Filtering**: Fast sector navigation with numbered buttons
+- **Responsive Design**: Adapts to different window sizes
 
-目录结构要求：
+## Requirements
 
-```text
-MacNfcTool/
-  third_party/
-    libnfc/   # libnfc 源码根目录
-```
+- MacOS
+- Node.js 18+
+- PN532 NFC module
+- Tauri development environment
 
-2. 安装构建工具（macOS）
+## Installation
 
-```bash
-brew install automake autoconf libtool pkg-config
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/MacNfcTool.git
+   cd MacNfcTool
+   ```
 
-3. 安装 Node、Rust、Tauri CLI 依赖（首次）
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm install
-```
+3. **Build the project**
+   ```bash
+   npm run build
+   ```
 
-## 一键编译运行
+4. **Run the application**
+   ```bash
+   npm run dev
+   ```
 
-```bash
-./run.sh
-```
+## Usage
 
-如果需要指定连接串（例如 PN532 UART）：
+### Connecting to a Reader
+1. Connect your PN532 NFC module to your Mac
+2. Click "连接读卡器" to establish a connection
+3. The device information will be displayed in the sidebar
 
-```bash
-./run.sh "pn532_uart:/dev/tty.usbserial-xxxx"
-```
+### Reading Card Information
+1. Place a Mifare Classic card on the reader
+2. Click "读取卡片信息" to get basic card details
 
-排查设备发现问题：
+### Reading Sectors
+1. Select a sector using the quick filter buttons (0-15)
+2. Click the "读取" button on the sector card
+3. The sector data will be displayed in hex format
 
-```bash
-LIBNFC_AUTO_SCAN=true LIBNFC_INTRUSIVE_SCAN=true \
-  ./third_party/libnfc/build/install/bin/nfc-scan-device
-```
+### Writing Sectors
+1. Select a sector using the quick filter buttons (0-15)
+2. Click the "写入" button on the sector card
+3. Enter the data you want to write
 
-`run.sh` 会自动：
-- 编译并安装 `third_party/libnfc` 到 `third_party/libnfc/build/install`
-- 设置 `LIBNFC_INCLUDE_DIR` / `LIBNFC_LIB_DIR`
-- 运行 `cargo check`
-- 启动 `npm run tauri:dev`
+### Reading All Sectors
+1. Click the "读取全部数据" button in the top right corner
+2. All 16 sectors will be read and displayed
 
-## 构建发布
+### Saving/Loading Data
+1. Enter a file path in the "文件路径(JSON)" field
+2. Click "读取并保存16扇区" to save all sector data to a file
+3. Click "从文件加载预览" to load data from a file
+4. Click "将文件写入卡片" to write data from a file to the card
 
-```bash
-npm run tauri:build
-```
+## Key Presets
 
-## 技术实现说明
+The tool includes common Mifare Classic keys:
+- `FFFFFFFFFFFF` (Default factory key)
+- `A0A1A2A3A4A5` (NXP default key)
+- `D3F7D3F7D3F7` (Common key)
+- `000000000000` (All zeros key)
 
-- 前端：React + TypeScript，通过 `@tauri-apps/api/core` 调用后端命令。
-- 后端：Rust Tauri 命令层 + C bridge。
-- C bridge：直接调用 `libnfc` C API 处理 PN532、寻卡、Mifare 认证、读写块。
+You can also select between Key A and Key B for authentication.
 
-## 注意事项
+## Troubleshooting
 
-- 当前示例只实现了 `Mifare Classic 1K (sector 0-15)`。
-- 写块前会用 `key A/B` 对扇区首块认证。
-- 某些卡片/扇区可能使用非默认密钥，需要手动输入正确密钥。
+### Common Errors
+- **Mifare Authentication Failed**: Check if the correct key and key type are selected
+- **No card detected**: Ensure the card is properly placed on the reader
+- **Reader not found**: Check the USB connection and driver installation
+
+### Tips
+- Always keep a backup of your card data before writing
+- Be cautious when writing to sector B3 (trailer block), as this contains key information
+- Use the log panel at the bottom right to monitor operations
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT License
